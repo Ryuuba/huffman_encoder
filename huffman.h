@@ -1,0 +1,101 @@
+/*
+ * <one line to give the library's name and an idea of what it does.>
+ * Copyright (C) 2015  Zelzin M. Marquez Navarrete <al2133033728@azc.uam.mx>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ */
+
+#ifndef HUFFMAN_H
+#define HUFFMAN_H
+
+#include <cstdint>   //uint64_t
+#include <cmath>     //ceil
+#include <fstream>   //ifstream, ofstream
+#include <iostream>  //cerr
+#include <queue>     //priority_queue
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <bitset>
+#include <list>
+#include <utility>   //pair
+#include <sstream>
+
+
+class Huffman
+{
+public:
+   /* Set of eight bits representing a byte */
+   typedef std::bitset<int(8)> Byte;
+   /* Set of bit representing a free-prefix binary code */
+   typedef std::vector<bool> Code;
+   /* List of bytes */
+   typedef std::list<Byte> Packet;
+   /* Tuple of kind <string, freq> representing nodes of a Huffman tree */
+   typedef std::pair<std::string, uint64_t> HuffmanNode;
+   /* Structure used by a priority queue in order to push elements in a given
+    * order */
+   struct Comparison
+   {
+      bool operator() (const HuffmanNode& lhs, const HuffmanNode& rhs) const
+      {return lhs.second >= rhs.second;}
+   };
+protected:
+   /* Name of the filename to be compressed */
+   std::string filename; 
+   /* Data structure storing duples of kind <char, count>, where char is a 
+    * character existing in file and count is the times such carachter 
+    * appers in the text */
+   std::unordered_map<unsigned char, uint64_t> characterMap;
+   /* Data structure storing duples of kind <char, Code>, where char is a 
+    * character appering in a loaded file and Code is a data structure keeping
+    * the bits comprising a the code of their corresponding char. It is used
+    * to compress a file */
+   std::unordered_map<unsigned char, Code> codeMap;
+   /* Data structure storing duples of kind <Code, char>, It is used to decode
+    * a file */
+   std::unordered_map<Code, unsigned char> decodeMap;
+   /* Priority queue storing HuffmanNodes */
+   std::priority_queue<HuffmanNode, std::vector<HuffmanNode>, Comparison> 
+   huffmanQueue;
+   /* Queue storing each caracter of the file to be compressed */
+   std::queue<unsigned char> text;   
+   /* Data structure storing a compressed text */
+   std::queue<unsigned char> codedText;
+   /* Size of a coded text */
+   unsigned textSize;
+   int limit;
+protected: 
+   virtual bool loadFile();
+   virtual bool loadCodedFile();
+   virtual void fillQueue();
+   virtual void computeHuffmanMap();
+   virtual bool writeHuffmanMap();
+   virtual unsigned char toChar(Byte&) const;
+   virtual Packet& toPacket(Code&, Packet&) const;
+   virtual Code& toCode(Packet&, Code&, int) const;
+   virtual bool encode();
+   virtual bool decode();
+   virtual void printHuffmanMap();
+   virtual void printText();
+public:
+   Huffman(){}
+   ~Huffman(){}
+   bool compress(std::string&);
+   bool decompress(std::string&, int l = 1000);
+};
+
+#endif // HUFFMAN_H
