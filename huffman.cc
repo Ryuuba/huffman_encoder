@@ -18,7 +18,7 @@
  * 
  */
 
-#include "huffman.h"
+#include "huffman"
 
 bool Huffman::loadFile()
 {
