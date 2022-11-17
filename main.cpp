@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include "huffman.h"
-#include "huffman.cpp"
 
 int main(int argc, char **argv) {
    std::string filename, arg;
