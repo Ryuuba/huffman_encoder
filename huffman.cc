@@ -54,31 +54,33 @@ bool Huffman::loadFile()
 
 void Huffman::fillQueue()
 {
-   HuffmanNode node;
-   for(auto& pair : characterMap)
-   {
-      node.first=pair.first;
-      node.second=pair.second;
-      huffmanQueue.push(node);      
-   }
-   characterMap.clear();
+    HuffmanNode node;
+    for(auto& pair : characterMap)
+    {
+        node.first=pair.first;
+        node.second=pair.second;
+        huffmanQueue.push(node);      
+    }
+    characterMap.clear();
 }
 
 void Huffman::computeHuffmanMap()
 {
-   HuffmanNode left, right, intermediate;
-   while(huffmanQueue.size()>1)
-   {
-      left=huffmanQueue.top(); huffmanQueue.pop();
-      right=huffmanQueue.top(); huffmanQueue.pop();
-      for(char& k : left.first)
-         codeMap[k].push_back(false);
-      for(char& k : right.first)
-         codeMap[k].push_back(true);
-      intermediate.first=left.first+right.first;
-      intermediate.second=left.second+right.second;
-      huffmanQueue.push(intermediate);
-   }
+    
+    HuffmanNode left, right, intermediate;
+    // This algorithm does not produce Huffman codes, but prefix codes
+    while(huffmanQueue.size()>1)
+    {
+        left=huffmanQueue.top(); huffmanQueue.pop();
+        right=huffmanQueue.top(); huffmanQueue.pop();
+        for(char& k : left.first)
+            codeMap[k].push_back(false);
+        for(char& k : right.first)
+            codeMap[k].push_back(true);
+        intermediate.first=left.first+right.first;
+        intermediate.second=left.second+right.second;
+        huffmanQueue.push(intermediate);
+    }
 }
 
 void Huffman::printHuffmanMap()
